@@ -108,7 +108,7 @@ function CreateGeometryBuffers(program) {
 function createVBO(program, vert) {
     let vbo = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-    gl.bufferData(gl.ARRAY_BUFFER, vert, gl.STATIC_DRAW);  // <-- Rettet fra bufferDate
+    gl.bufferData(gl.ARRAY_BUFFER, vert, gl.STATIC_DRAW);
 
     const stride = 6 * Float32Array.BYTES_PER_ELEMENT;
 
