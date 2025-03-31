@@ -8,6 +8,7 @@
     <div>
         <a href="index.html">Trakant</a>
         <a href="Firkant.html">firkant</a>
+        <a href="3D/3D.html">3D kasse</a>
       </div>
 
 <canvas id="gl" width="800px" height="600px">
@@ -16,7 +17,7 @@
 
 <div>
     Vertex Shader
-    <textarea id="vs" spellcheck="false">
+    <textarea id="vs" spellcheck="false" rows="10" cols="30">
         attribute vec3 Pos;
         attribute vec3 Color;
         varying vec3 vertexColor;
@@ -30,7 +31,7 @@
 
 <div>
     Fragment Shader
-    <textarea id="fs" spellcheck="false">
+    <textarea id="fs" spellcheck="false" rows="10" cols="30">
         precision mediump float;
         varying vec3 vertexColor;
         void main()
