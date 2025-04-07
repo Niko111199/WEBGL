@@ -90,6 +90,8 @@ function createQuad(width,height){
                  w, h, 0.0, 1.0, 1.0, 0.0);
 }
 
+
+
 function Create3DCube(width, height, depth){
     vertices.length = 0;
     const w = width * 0.5;
@@ -131,6 +133,94 @@ function Create3DCube(width, height, depth){
              w, -h, -d, 1, 0, 1,
              w,  h, -d, 1, 0, 1,
              w,  h,  d, 1, 0, 1);
+}
+
+function CreateSub3DCube(width, height, depth, subdivideX, subdivideY, subdivideZ){
+    vertices.length = 0;
+    const w = width * 0.5;
+    const h = height * 0.5;
+    const d = depth * 0.5;
+
+    
+    function addSubdividedQuad(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, color) {
+        AddQuad(x1, y1, z1, color[0], color[1], color[2],
+                x2, y2, z2, color[0], color[1], color[2],
+                x3, y3, z3, color[0], color[1], color[2],
+                x4, y4, z4, color[0], color[1], color[2]);
+    }
+
+    
+    for (let i = 0; i < subdivideY; i++) {
+        for (let j = 0; j < subdivideX; j++) {
+            const x1 = -w + j * (w * 2 / subdivideX);
+            const x2 = -w + (j + 1) * (w * 2 / subdivideX);
+            const y1 = h - i * (h * 2 / subdivideY);
+            const y2 = h - (i + 1) * (h * 2 / subdivideY);
+
+            addSubdividedQuad(x1, y1, d, x2, y1, d, x2, y2, d, x1, y2, d, [(i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0]); 
+        }
+    }
+
+    
+    for (let i = 0; i < subdivideY; i++) {
+        for (let j = 0; j < subdivideX; j++) {
+            const x1 = w - j * (w * 2 / subdivideX);
+            const x2 = w - (j + 1) * (w * 2 / subdivideX);
+            const y1 = h - i * (h * 2 / subdivideY);
+            const y2 = h - (i + 1) * (h * 2 / subdivideY);
+    
+            
+            addSubdividedQuad(x1, y1, -d, x2, y1, -d, x2, y2, -d, x1, y2, -d, [(i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1]);
+        }
+    }
+
+    
+    for (let i = 0; i < subdivideX; i++) {
+        for (let j = 0; j < subdivideZ; j++) {
+            const x1 = -w + i * (w * 2 / subdivideX);
+            const x2 = -w + (i + 1) * (w * 2 / subdivideX);
+            const z1 = -d + j * (d * 2 / subdivideZ);
+            const z2 = -d + (j + 1) * (d * 2 / subdivideZ);
+
+            addSubdividedQuad(x1, h, z1, x2, h, z1, x2, h, z2, x1, h, z2, [(i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0]);
+        }
+    }
+
+    
+    for (let i = 0; i < subdivideX; i++) {
+        for (let j = 0; j < subdivideZ; j++) {
+            const x1 = -w + i * (w * 2 / subdivideX);
+            const x2 = -w + (i + 1) * (w * 2 / subdivideX);
+            const z1 = -d + j * (d * 2 / subdivideZ);
+            const z2 = -d + (j + 1) * (d * 2 / subdivideZ);
+
+            addSubdividedQuad(x1, -h, z1, x1, -h, z2, x2, -h, z2, x2, -h, z1, [(i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1]); 
+        }
+    }
+
+    
+    for (let i = 0; i < subdivideY; i++) {
+        for (let j = 0; j < subdivideZ; j++) {
+            const y1 = h - i * (h * 2 / subdivideY);
+            const y2 = h - (i + 1) * (h * 2 / subdivideY);
+            const z1 = -d + j * (d * 2 / subdivideZ);
+            const z2 = -d + (j + 1) * (d * 2 / subdivideZ);
+
+            addSubdividedQuad(-w, y1, z1, -w, y1, z2, -w, y2, z2, -w, y2, z1, [(i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0]);
+        }
+    }
+
+    
+    for (let i = 0; i < subdivideY; i++) {
+        for (let j = 0; j < subdivideZ; j++) {
+            const y1 = h - i * (h * 2 / subdivideY);
+            const y2 = h - (i + 1) * (h * 2 / subdivideY);
+            const z1 = -d + j * (d * 2 / subdivideZ);
+            const z2 = -d + (j + 1) * (d * 2 / subdivideZ);
+
+            addSubdividedQuad(w, y1, z1, w, y2, z1, w, y2, z2, w, y1, z2, [(i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1]);
+        }
+    }
 }
 
 
@@ -217,20 +307,37 @@ function CreateGeometryUI(){
     const h = eh ? eh.value : 1.0;
     const ed = document.getElementById('d');
     const d = ed ? ed.value : 1.0;
+    
+    const sxi = document.getElementById('sx');
+    const x = sxi ? Math.floor(sxi.value) : 1.0;
+    const syi = document.getElementById('sy');
+    const y = syi ? Math.floor(syi.value) : 1.0;
+    const zyi = document.getElementById('sz');
+    const z = zyi ? Math.floor(zyi.value) : 1.0;
+    
 
     document.getElementById('ui').innerHTML =
         'Width: <input type="number" id="w" value="'+ w +'" onchange="initShaders();"><br>' +
         'Height: <input type="number" id="h" value="'+ h +'" onchange="initShaders();"><br>' +
-        'Depth: <input type="number" id="d" value="'+ d +'" onchange="initShaders();"><br>';
+        'Depth: <input type="number" id="d" value="'+ d +'" onchange="initShaders();"><br>' +
+        'Subdivide X: <input type="number" step="1" id="sx" value="' + x + '" onchange="initShaders();"><br>' +
+        'Subdivide Y: <input type="number" step="1" id="sy" value="' + y + '" onchange="initShaders();"><br>' +
+        'Subdivide Z: <input type="number" id="sz" value="' + z + '" onchange="initShaders();"><br>';
 
-     let e = document.getElementById('shape');
-switch (e.selectedIndex)
-{
-  case 0: CreateTriangle(w, h); break;
-  case 1: createQuad(w ,h); break;
-  case 2: Create3DCube(w, h, d); break;
+    let e = document.getElementById('shape');
+    switch (e.selectedIndex) {
+        case 0: CreateTriangle(w, h); break;
+        case 1: createQuad(w ,h); break;
+        case 2: 
+            if (x == 1 && y == 1 && z == 1) {
+                Create3DCube(w, h, d); 
+            } else {
+                CreateSub3DCube(w, h, d, x, y, z);
+            }
+            break;
+    }
 }
-}
+
 
 function CreateGeometryBuffers(program) {
 
