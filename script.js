@@ -1,5 +1,25 @@
+var vertices = [];
+
 var gl = document.getElementById('gl')
 .getContext('webgl');
+
+var mouseX = 0, mouseY = 0;
+var angle = [0.0, 0.0, 0.0, 1.0];
+var angleGL = 0;
+
+document.getElementById('gl').addEventListener(
+    'mousemove', function(e){
+        if (e.buttons == 1){
+            angle[0] -= (mouseY -e.y) * 0.1;
+            angle[1] += (mouseX -e.x) * 0.1;
+            gl.uniform4fv(angleGL, new Float32Array(angle));
+            Render();
+        }
+        mouseX = e.x;
+        mouseY = e.y;
+    }
+)
+
 
 function initWebGl(){
     if(!gl){
@@ -16,6 +36,104 @@ function initWebGl(){
     }
     initViewport();
 }
+
+function AddVertex(x,y,z,r,g,b){
+    const index = vertices.length;
+    vertices.length +=6
+    vertices[index + 0] = x;
+    vertices[index + 1] = y;
+    vertices[index + 2] = z;
+    vertices[index + 3] = r;
+    vertices[index + 4] = g;
+    vertices[index + 5] = b;
+}
+
+function AddTriangle(x1,y1,z1,r1,g1,b1,
+                     x2,y2,z2,r2,g2,b2,
+                     x3,y3,z3,r3,g3,b3){
+
+    AddVertex(x1,y1,z1,r1,g1,b1);
+    AddVertex(x2,y2,z2,r2,g2,b2);
+    AddVertex(x3,y3,z3,r3,g3,b3);
+}
+
+function CreateTriangle(width, height){
+    vertices.length = 0;
+    const w = width * 0.5;
+    const h = height * 0.5;
+    AddTriangle(0.0, h, 0.0, 1.0, 0.0, 0.0,
+                -w, -h, 0.0, 0.0, 1.0, 0.0,
+                 w, -h, 0.0, 0.0, 0.0, 1.0);
+}
+
+function AddQuad(x1,y1,z1,r1,g1,b1,
+                 x2,y2,z2,r2,g2,b2,
+                 x3,y3,z3,r3,g3,b3,
+                 x4,y4,z4,r4,g4,b4){
+
+    AddTriangle(x1,y1,z1,r1,g1,b1,
+                x2,y2,z2,r2,g2,b2,
+                x3,y3,z3,r3,g3,b3);
+
+    AddTriangle(x3,y3,z3,r3,g3,b3,
+                x4,y4,z4,r4,g4,b4,
+                x1,y1,z1,r1,g1,b1);
+}
+
+function createQuad(width,height){
+    vertices.length = 0;
+    const w = width * 0.5;
+    const h = height * 0.5;
+        AddQuad(-w, h, 0.0, 1.0, 0.0, 0.0,
+                -w,-h, 0.0, 0.0, 1.0, 0.0,
+                 w,-h, 0.0, 0.0, 0.0, 1.0,
+                 w, h, 0.0, 1.0, 1.0, 0.0);
+}
+
+function Create3DCube(width, height, depth){
+    vertices.length = 0;
+    const w = width * 0.5;
+    const h = height * 0.5;
+    const d = depth * 0.5;
+
+    // Forside (rød)
+    AddQuad(-w, -h,  d, 1, 0, 0,
+             w, -h,  d, 1, 0, 0,
+             w,  h,  d, 1, 0, 0,
+            -w,  h,  d, 1, 0, 0);
+
+    // Bagside (grøn)
+    AddQuad( w, -h, -d, 0, 1, 0,
+            -w, -h, -d, 0, 1, 0,
+            -w,  h, -d, 0, 1, 0,
+             w,  h, -d, 0, 1, 0);
+
+    // Top (blå)
+    AddQuad(-w,  h,  d, 0, 0, 1,
+             w,  h,  d, 0, 0, 1,
+             w,  h, -d, 0, 0, 1,
+            -w,  h, -d, 0, 0, 1);
+
+    // Bund (gul)
+    AddQuad(-w, -h, -d, 1, 1, 0,
+             w, -h, -d, 1, 1, 0,
+             w, -h,  d, 1, 1, 0,
+            -w, -h,  d, 1, 1, 0);
+
+    // Venstre (cyan)
+    AddQuad(-w, -h, -d, 0, 1, 1,
+            -w, -h,  d, 0, 1, 1,
+            -w,  h,  d, 0, 1, 1,
+            -w,  h, -d, 0, 1, 1);
+
+    // Højre (magenta)
+    AddQuad( w, -h,  d, 1, 0, 1,
+             w, -h, -d, 1, 0, 1,
+             w,  h, -d, 1, 0, 1,
+             w,  h,  d, 1, 0, 1);
+}
+
+
 
 function initViewport(){
     gl.viewport(0,
@@ -92,14 +210,35 @@ function ValidateShaderProgram(p){
     return true;
 }
 
+function CreateGeometryUI(){
+    const ew = document.getElementById('w');
+    const w = ew ? ew.value : 1.0;
+    const eh = document.getElementById('h');
+    const h = eh ? eh.value : 1.0;
+    const ed = document.getElementById('d');
+    const d = ed ? ed.value : 1.0;
+
+    document.getElementById('ui').innerHTML =
+        'Width: <input type="number" id="w" value="'+ w +'" onchange="initShaders();"><br>' +
+        'Height: <input type="number" id="h" value="'+ h +'" onchange="initShaders();"><br>' +
+        'Depth: <input type="number" id="d" value="'+ d +'" onchange="initShaders();"><br>';
+
+     let e = document.getElementById('shape');
+switch (e.selectedIndex)
+{
+  case 0: CreateTriangle(w, h); break;
+  case 1: createQuad(w ,h); break;
+  case 2: Create3DCube(w, h, d); break;
+}
+}
+
 function CreateGeometryBuffers(program) {
-    const vertices = [
-        0.0,  0.5,  0.0, 1.0, 0.0, 0.0,
-       -0.5, -0.5,  0.0, 0.0, 1.0, 0.0,
-        0.5, -0.5,  0.0, 0.0, 0.0, 1.0
-    ];
+
+    CreateGeometryUI();
 
     createVBO(program, new Float32Array(vertices));
+
+    angleGL = gl.getUniformLocation(program, 'angle');
 
     gl.useProgram(program);
     Render();
@@ -133,5 +272,6 @@ function createVBO(program, vert) {
 function Render(){
     gl.clearColor(0.0, 0.4, 0.6, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES,0,3); 
+    gl.drawArrays(gl.TRIANGLES,0,vertices.length / 6); 
 }
+

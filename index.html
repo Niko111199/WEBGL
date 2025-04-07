@@ -5,12 +5,6 @@
 </head>
 <body onload="initWebGl()">
 
-    <div>
-        <a href="index.html">Trakant</a>
-        <a href="Firkant.html">firkant</a>
-        <a href="3D/3D.html">3D kasse</a>
-      </div>
-
 <canvas id="gl" width="800px" height="600px">
   WebGl is not supported!
 </canvas>
@@ -20,10 +14,23 @@
     <textarea id="vs" spellcheck="false" rows="10" cols="30">
         attribute vec3 Pos;
         attribute vec3 Color;
+        uniform vec4 angle;
         varying vec3 vertexColor;
         void main()
         {
-            gl_Position= vec4(Pos, 1.0);
+            float coX= cos(angle.x);
+            float siX= sin(angle.x);
+            mat4 matX= mat4(vec4(1.0, 0.0, 0.0, 0.0),
+                            vec4(0.0, coX, siX, 0.0),
+                            vec4(0.0,-siX, coX, 0.0),
+                            vec4(0.0, 0.0, 0.0, 1.0));
+            float coY= cos(angle.y);
+            float siY= sin(angle.y);
+            mat4 matY= mat4(vec4(coY, 0.0,-siY, 0.0),
+                            vec4(0.0, 1.0, 0.0, 0.0),
+                            vec4(siY, 0.0, coY, 0.0),
+                            vec4(0.0, 0.0, 0.0, 1.0));
+            gl_Position= matY* matX* vec4(Pos, 1.0);
             vertexColor= Color;
         }
 </textarea>
@@ -40,6 +47,14 @@
         }
 </textarea>
 </div>
+
+<select id="shape" onchange="initShaders();">
+    <option selected>Triangle</option>
+    <option>Quad</option>
+    <option>3D cube</option>
+</select>
+
+<div id="ui"></div>
 
 
 <script src="script.js" defer></script>
