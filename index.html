@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>WEBGL</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body onload="initWebGl()">
 
@@ -10,6 +11,8 @@
         <option>Quad</option>
         <option>3D cube</option>
     </select>
+
+    <input type="checkbox" id="texture", onchange="Update()"> Show Texture <br>
     
     <div id="ui"></div>
 
@@ -22,8 +25,10 @@
     <textarea id="vs" spellcheck="false" rows="10" cols="30">
         attribute vec3 Pos;
         attribute vec3 Color;
+        attribute vec2 UV;
         uniform vec4 angle;
         varying vec3 vertexColor;
+        varying vec2 uv;
         void main()
         {
             float coX= cos(angle.x);
@@ -40,6 +45,7 @@
                             vec4(0.0, 0.0, 0.0, 1.0));
             gl_Position= matY* matX* vec4(Pos, 1.0) + vec4(0.0,0.0,0.2,1.0);
             vertexColor= Color;
+            uv = UV;
         }
 </textarea>
 </div>
@@ -48,10 +54,17 @@
     Fragment Shader
     <textarea id="fs" spellcheck="false" rows="10" cols="30">
         precision mediump float;
+        uniform sampler2D Texture;
+        uniform vec4 Display;
         varying vec3 vertexColor;
+        varying vec2 uv;
         void main()
         {
-            gl_FragColor= vec4(vertexColor, 1.0);
+            float p = abs(Display.w);
+            vec3 textureColor = texture2D(Texture, uv).rgb;
+            vec3 color = vertexColor;
+            gl_FragColor = vec4(mix(color, textureColor, p), 1.0);
+
         }
 </textarea>
 </div>
