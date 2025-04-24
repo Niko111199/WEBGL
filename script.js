@@ -24,7 +24,6 @@ document.getElementById('gl').addEventListener(
     }
 )
 
-
 function initWebGl(){
     if(!gl){
         alert('WebGl is no supported');
@@ -400,11 +399,18 @@ function Render(){
     gl.clearColor(0.0, 0.4, 0.6, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES,0,vertices.length / 8); 
+
+    if (userTexture) {
+        gl.bindTexture(gl.TEXTURE_2D, userTexture);
+    } else {
+        gl.bindTexture(gl.TEXTURE_2D, defaultTexture);
+    }
 }
 
 function CreateTexture(prog, url){
 
     const texture = LoadTexture(url);
+    defaultTexture = LoadTexture(url);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,texture);
@@ -437,6 +443,7 @@ function LoadTexture(url) {
             gl.UNSIGNED_BYTE,   
             image);
             SetTextureFilteres(image);
+            Render(); 
     };
 
     image.src = url;
@@ -453,7 +460,7 @@ function SetTextureFilteres(image){
 
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.textImage2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     }
 }
 
@@ -470,3 +477,40 @@ function Update(){
     gl.uniform4fv(displayGL,new Float32Array(display));
     Render();
 }
+
+let userTexture = null;
+let defaultTexture = null;
+
+document.getElementById('imageUpload').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    img.onload = function() {
+        userTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, userTexture);
+
+        
+        gl.texImage2D(
+          gl.TEXTURE_2D, 0, gl.RGBA,
+          gl.RGBA, gl.UNSIGNED_BYTE,
+          img
+        );
+
+        if (IsPow2(img.width) && IsPow2(img.height)) {
+            
+            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        } else {
+            
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
+       
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+        Render(); 
+    };
+    img.src = URL.createObjectURL(file);
+});
