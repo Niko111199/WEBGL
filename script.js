@@ -8,7 +8,7 @@ var angle = [0.0, 0.0, 0.0, 1.0];
 var angleGL = 0;
 
 var textureGL = 0;
-var display = [0.0, 0.0, 0.0, 0.0];
+var display = [1.0, 1.0, 1.0, 1.0];
 var displayGL = 0;
 
 document.getElementById('gl').addEventListener(
@@ -40,9 +40,9 @@ function initWebGl(){
     initViewport();
 }
 
-function AddVertex(x,y,z,r,g,b,u,v){
+function AddVertex(x,y,z,r,g,b,u,v,nx,ny,nz){
     const index = vertices.length;
-    vertices.length +=8
+    vertices.length += 11;
     vertices[index + 0] = x;
     vertices[index + 1] = y;
     vertices[index + 2] = z;
@@ -51,48 +51,51 @@ function AddVertex(x,y,z,r,g,b,u,v){
     vertices[index + 5] = b;
     vertices[index + 6] = u;
     vertices[index + 7] = v;
+    vertices[index + 8] = nx;
+    vertices[index + 9] = ny;
+    vertices[index +10] = nz;
 }
 
-function AddTriangle(x1,y1,z1,r1,g1,b1,u1,v1,
-                     x2,y2,z2,r2,g2,b2,u2,v2,
-                     x3,y3,z3,r3,g3,b3,u3,v3){
+function AddTriangle(x1,y1,z1,r1,g1,b1,u1,v1,nx1,ny1,nz1,
+                     x2,y2,z2,r2,g2,b2,u2,v2,nx2,ny2,nz2,
+                     x3,y3,z3,r3,g3,b3,u3,v3,nx3,ny3,nz3){
 
-    AddVertex(x1,y1,z1,r1,g1,b1,u1,v1);
-    AddVertex(x2,y2,z2,r2,g2,b2,u2,v2);
-    AddVertex(x3,y3,z3,r3,g3,b3,u3,v3);
+    AddVertex(x1,y1,z1,r1,g1,b1,u1,v1,nx1,ny1,nz1);
+    AddVertex(x2,y2,z2,r2,g2,b2,u2,v2,nx2,ny2,nz2);
+    AddVertex(x3,y3,z3,r3,g3,b3,u3,v3,nx3,ny3,nz3);
 }
 
 function CreateTriangle(width, height){
     vertices.length = 0;
     const w = width * 0.5;
     const h = height * 0.5;
-    AddTriangle(0.0, h, 0.0, 1.0, 0.0, 0.0, 0.5, 1.0,
-                -w, -h, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-                 w, -h, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0);
+    AddTriangle(0.0, h, 0.0, 1.0, 0.0, 0.0, 0.5, 1.0, 0.0, 0.0, 1.0,
+                -w, -h, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+                 w, -h, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 }
 
-function AddQuad(x1,y1,z1,r1,g1,b1,u1,v1,
-                 x2,y2,z2,r2,g2,b2,u2,v2,
-                 x3,y3,z3,r3,g3,b3,u3,v3,
-                 x4,y4,z4,r4,g4,b4,u4,v4){
+function AddQuad(x1,y1,z1,r1,g1,b1,u1,v1,nx1,ny1,nz1,
+                 x2,y2,z2,r2,g2,b2,u2,v2,nx2,ny2,nz2,
+                 x3,y3,z3,r3,g3,b3,u3,v3,nx3,ny3,nz3,
+                 x4,y4,z4,r4,g4,b4,u4,v4,nx4,ny4,nz4){
 
-    AddTriangle(x1,y1,z1,r1,g1,b1,u1,v1,
-                x2,y2,z2,r2,g2,b2,u2,v2,
-                x3,y3,z3,r3,g3,b3,u3,v3);
+    AddTriangle(x1,y1,z1,r1,g1,b1,u1,v1,nx1,ny1,nz1,
+                x2,y2,z2,r2,g2,b2,u2,v2,nx2,ny2,nz2,
+                x3,y3,z3,r3,g3,b3,u3,v3,nx3,ny3,nz3);
 
-    AddTriangle(x3,y3,z3,r3,g3,b3,u3,v3,
-                x4,y4,z4,r4,g4,b4,u4,v4,
-                x1,y1,z1,r1,g1,b1,u1,v1);
+    AddTriangle(x3,y3,z3,r3,g3,b3,u3,v3,nx3,ny3,nz3,
+                x4,y4,z4,r4,g4,b4,u4,v4,nx4,ny4,nz4,
+                x1,y1,z1,r1,g1,b1,u1,v1,nx1,ny1,nz1);
 }
 
 function createQuad(width,height){
     vertices.length = 0;
     const w = width * 0.5;
     const h = height * 0.5;
-        AddQuad(-w, h, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0,
-                -w,-h, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-                 w,-h, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0,
-                 w, h, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0);
+        AddQuad(-w, h, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+                -w,-h, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+                 w,-h, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0,
+                 w, h, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0);
 }
 
 
@@ -104,40 +107,40 @@ function Create3DCube(width, height, depth){
     const d = depth * 0.5;
 
     // Forside (rød)
-    AddQuad(-w, -h,  d, 1, 0, 0, 0.0, 0.0,
-             w, -h,  d, 1, 0, 0, 1.0, 0.0,
-             w,  h,  d, 1, 0, 0, 1.0, 1.0,
-            -w,  h,  d, 1, 0, 0, 0.0, 1.0);
+    AddQuad(-w, -h,  d, 1, 0, 0, 0.0, 0.0, 0.0, 0.0, 1.0,
+             w, -h,  d, 1, 0, 0, 1.0, 0.0, 0.0, 0.0, 1.0,
+             w,  h,  d, 1, 0, 0, 1.0, 1.0, 0.0, 0.0, 1.0,
+            -w,  h,  d, 1, 0, 0, 0.0, 1.0, 0.0, 0.0, 1.0);
 
     // Bagside (grøn)
-    AddQuad( w, -h, -d, 0, 1, 0, 0.0, 0.0,
-            -w, -h, -d, 0, 1, 0, 1.0, 0.0,
-            -w,  h, -d, 0, 1, 0, 1.0, 1.0,
-             w,  h, -d, 0, 1, 0, 0.0, 1.0);
+    AddQuad( w, -h, -d, 0, 1, 0, 0.0, 0.0, 0.0, 0.0, 1.0,
+            -w, -h, -d, 0, 1, 0, 1.0, 0.0, 0.0, 0.0, 1.0,
+            -w,  h, -d, 0, 1, 0, 1.0, 1.0, 0.0, 0.0, 1.0,
+             w,  h, -d, 0, 1, 0, 0.0, 1.0, 0.0, 0.0, 1.0);
 
     // Top (blå)
-    AddQuad(-w,  h,  d, 0, 0, 1, 0.0, 0.0,
-             w,  h,  d, 0, 0, 1, 1.0, 0.0,
-             w,  h, -d, 0, 0, 1, 1.0, 1.0,
-            -w,  h, -d, 0, 0, 1, 0.0, 1.0);
+    AddQuad(-w,  h,  d, 0, 0, 1, 0.0, 0.0, 0.0, 0.0, 1.0,
+             w,  h,  d, 0, 0, 1, 1.0, 0.0, 0.0, 0.0, 1.0,
+             w,  h, -d, 0, 0, 1, 1.0, 1.0, 0.0, 0.0, 1.0,
+            -w,  h, -d, 0, 0, 1, 0.0, 1.0, 0.0, 0.0, 1.0);
 
     // Bund (gul)
-    AddQuad(-w, -h, -d, 1, 1, 0, 0.0, 0.0,
-             w, -h, -d, 1, 1, 0, 1.0, 0.0,
-             w, -h,  d, 1, 1, 0, 1.0, 1.0,
-            -w, -h,  d, 1, 1, 0, 0.0, 1.0);
+    AddQuad(-w, -h, -d, 1, 1, 0, 0.0, 0.0, 0.0, 0.0, 1.0,
+             w, -h, -d, 1, 1, 0, 1.0, 0.0, 0.0, 0.0, 1.0,
+             w, -h,  d, 1, 1, 0, 1.0, 1.0, 0.0, 0.0, 1.0,
+            -w, -h,  d, 1, 1, 0, 0.0, 1.0, 0.0, 0.0, 1.0);
 
     // Venstre (cyan)
-    AddQuad(-w, -h, -d, 0, 1, 1, 0.0, 0.0, 
-            -w, -h,  d, 0, 1, 1, 1.0, 0.0,
-            -w,  h,  d, 0, 1, 1, 1.0, 1.0,
-            -w,  h, -d, 0, 1, 1, 0.0, 1.0);
+    AddQuad(-w, -h, -d, 0, 1, 1, 0.0, 0.0, 0.0, 0.0, 1.0, 
+            -w, -h,  d, 0, 1, 1, 1.0, 0.0, 0.0, 0.0, 1.0,
+            -w,  h,  d, 0, 1, 1, 1.0, 1.0, 0.0, 0.0, 1.0,
+            -w,  h, -d, 0, 1, 1, 0.0, 1.0, 0.0, 0.0, 1.0);
 
     // Højre (magenta)
-    AddQuad( w, -h,  d, 1, 0, 1, 0.0, 0.0,
-             w, -h, -d, 1, 0, 1, 1.0, 0.0,
-             w,  h, -d, 1, 0, 1, 1.0, 1.0,
-             w,  h,  d, 1, 0, 1, 0.0, 1.0);
+    AddQuad( w, -h,  d, 1, 0, 1, 0.0, 0.0, 0.0, 0.0, 1.0,
+             w, -h, -d, 1, 0, 1, 1.0, 0.0, 0.0, 0.0, 1.0,
+             w,  h, -d, 1, 0, 1, 1.0, 1.0, 0.0, 0.0, 1.0,
+             w,  h,  d, 1, 0, 1, 0.0, 1.0, 0.0, 0.0, 1.0);
 }
 
 function CreateSub3DCube(width, height, depth, subdivideX, subdivideY, subdivideZ){
@@ -147,11 +150,11 @@ function CreateSub3DCube(width, height, depth, subdivideX, subdivideY, subdivide
     const d = depth * 0.5;
 
     
-    function addSubdividedQuad(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, color, u1, v1, u2, v2, u3, v3, u4, v4) {
-        AddQuad(x1, y1, z1, color[0], color[1], color[2], u1, v1,
-                x2, y2, z2, color[0], color[1], color[2], u2, v2,
-                x3, y3, z3, color[0], color[1], color[2], u3, v3,
-                x4, y4, z4, color[0], color[1], color[2], u4, v4);
+    function addSubdividedQuad(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, color, u1, v1, u2, v2, u3, v3, u4, v4,nx1,ny1,nz1,nx2,ny2,nz2,nx3,ny3,nz3,nx4,ny4,nz4) {
+        AddQuad(x1, y1, z1, color[0], color[1], color[2], u1, v1, nx1, ny1, nz1,
+                x2, y2, z2, color[0], color[1], color[2], u2, v2, nx2, ny2, nz2,
+                x3, y3, z3, color[0], color[1], color[2], u3, v3, nx3, ny3, nz3,
+                x4, y4, z4, color[0], color[1], color[2], u4, v4, nx4, ny4, nz4);
     }
 
     
@@ -370,7 +373,7 @@ function createVBO(program, vert) {
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
     gl.bufferData(gl.ARRAY_BUFFER, vert, gl.STATIC_DRAW);
 
-    const stride = 8 * Float32Array.BYTES_PER_ELEMENT;
+    const stride = 11 * Float32Array.BYTES_PER_ELEMENT;
 
     let posAttrib = gl.getAttribLocation(program, 'Pos');
     if (posAttrib === -1) {
@@ -398,7 +401,7 @@ function createVBO(program, vert) {
 function Render(){
     gl.clearColor(0.0, 0.4, 0.6, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES,0,vertices.length / 8); 
+    gl.drawArrays(gl.TRIANGLES,0,vertices.length / 11); 
 
     if (userTexture) {
         gl.bindTexture(gl.TEXTURE_2D, userTexture);
@@ -443,7 +446,7 @@ function LoadTexture(url) {
             gl.UNSIGNED_BYTE,   
             image);
             SetTextureFilteres(image);
-            Render(); 
+            Render();
     };
 
     image.src = url;
@@ -473,6 +476,11 @@ function Update(){
 
     const t = document.getElementById('texture');
     display[3]=t.checked ? 1.0:0.0;
+
+    const l = document.getElementById('light').value;
+    display[0] = parseInt(l.substring(1,3),16) / 255.0;
+    display[1] = parseInt(l.substring(3,5),16) / 255.0;
+    display[2] = parseInt(l.substring(5,7),16) / 255.0;
 
     gl.uniform4fv(displayGL,new Float32Array(display));
     Render();
@@ -514,3 +522,4 @@ document.getElementById('imageUpload').addEventListener('change', function(event
     };
     img.src = URL.createObjectURL(file);
 });
+  
