@@ -522,4 +522,3 @@ document.getElementById('imageUpload').addEventListener('change', function(event
     };
     img.src = URL.createObjectURL(file);
 });
-  
