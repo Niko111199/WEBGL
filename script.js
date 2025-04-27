@@ -231,7 +231,61 @@ function CreateSub3DCube(width, height, depth, subdivideX, subdivideY, subdivide
     }
 }
 
+function CreateCylinder(radius, height, segments) {
+    vertices.length = 0;
+    const halfHeight = height * 0.5;
+    const angleStep = (Math.PI * 2) / segments;
 
+
+    for (let i = 0; i < segments; i++) {
+        const theta = i * angleStep;
+        const nextTheta = (i + 1) * angleStep;
+
+        const x1 = radius * Math.cos(theta);
+        const z1 = radius * Math.sin(theta);
+        const x2 = radius * Math.cos(nextTheta);
+        const z2 = radius * Math.sin(nextTheta);
+
+        
+        AddTriangle(
+            x1, halfHeight, z1, 1, 0, 0, i / segments, 1, 0, 1, 0,
+            x2, halfHeight, z2, 1, 0, 0, (i + 1) / segments, 1, 0, 1, 0,
+            x2, -halfHeight, z2, 1, 0, 0, (i + 1) / segments, 0, 0, 1, 0
+        );
+
+    
+        AddTriangle(
+            x1, halfHeight, z1, 1, 0, 0, i / segments, 1, 0, 1, 0,
+            x2, -halfHeight, z2, 1, 0, 0, (i + 1) / segments, 0, 0, 1, 0,
+            x1, -halfHeight, z1, 1, 0, 0, i / segments, 0, 0, 1, 0
+        );
+    }
+
+   
+    for (let i = 0; i < segments; i++) {
+        const theta = i * angleStep;
+        const nextTheta = (i + 1) * angleStep;
+
+        const x1 = radius * Math.cos(theta);
+        const z1 = radius * Math.sin(theta);
+        const x2 = radius * Math.cos(nextTheta);
+        const z2 = radius * Math.sin(nextTheta);
+
+        
+        AddTriangle(
+            0, halfHeight, 0, 0, 1, 0, 0.5, 0.5, 0, 1, 0,
+            x2, halfHeight, z2, 0, 1, 0, (Math.cos(nextTheta) * 0.5 + 0.5), (Math.sin(nextTheta) * 0.5 + 0.5), 0, 1, 0,
+            x1, halfHeight, z1, 0, 1, 0, (Math.cos(theta) * 0.5 + 0.5), (Math.sin(theta) * 0.5 + 0.5), 0, 1, 0
+        );
+
+        
+        AddTriangle(
+            0, -halfHeight, 0, 0, 0, 1, 0.5, 0.5, 0, -1, 0,
+            x1, -halfHeight, z1, 0, 0, 1, (Math.cos(theta) * 0.5 + 0.5), (Math.sin(theta) * 0.5 + 0.5), 0, -1, 0,
+            x2, -halfHeight, z2, 0, 0, 1, (Math.cos(nextTheta) * 0.5 + 0.5), (Math.sin(nextTheta) * 0.5 + 0.5), 0, -1, 0
+        );
+    }
+}
 
 function initViewport(){
     gl.viewport(0,
@@ -315,6 +369,8 @@ function CreateGeometryUI(){
     const h = eh ? eh.value : 1.0;
     const ed = document.getElementById('d');
     const d = ed ? ed.value : 1.0;
+    const er = document.getElementById('r');
+    const r  = er ? parseFloat(er.value) : 0.1;
     
     const sxi = document.getElementById('sx');
     const x = sxi ? Math.floor(sxi.value) : 1.0;
@@ -328,6 +384,7 @@ function CreateGeometryUI(){
         'Width: <input type="number" id="w" value="'+ w +'" onchange="initShaders();"><br>' +
         'Height: <input type="number" id="h" value="'+ h +'" onchange="initShaders();"><br>' +
         'Depth: <input type="number" id="d" value="'+ d +'" onchange="initShaders();"><br>' +
+        'Radius: <input type="number" id="r" value="'+ r +'" onchange="initShaders();"><br>' +
         'Subdivide X: <input type="number" step="1" id="sx" value="' + x + '" onchange="initShaders();"><br>' +
         'Subdivide Y: <input type="number" step="1" id="sy" value="' + y + '" onchange="initShaders();"><br>' +
         'Subdivide Z: <input type="number" id="sz" value="' + z + '" onchange="initShaders();"><br>';
@@ -343,6 +400,7 @@ function CreateGeometryUI(){
                 CreateSub3DCube(w, h, d, x, y, z);
             }
             break;
+        case 3: CreateCylinder(r, h, 32); break;
     }
 }
 
