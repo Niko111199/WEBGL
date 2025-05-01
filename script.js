@@ -412,6 +412,8 @@ function CreateGeometryBuffers(program) {
     createVBO(program, new Float32Array(vertices));
 
     angleGL = gl.getUniformLocation(program, 'angle');
+    proGL=gl.getUniformLocation(program,'projection');
+    modGL= gl.getUniformLocation(program,'modelView');
 
     CreateTexture(program, 'img/tekstur.jpg');
 
@@ -456,9 +458,30 @@ function createVBO(program, vert) {
     gl.enableVertexAttribArray(u);
 }
 
+var proGL = 0;
+var projection = [ 0.0, 0.0, 0.0, 0.0,
+                  0.0, 0.0, 0.0, 0.0,
+                   0.0, 0.0, 0.0, 0.0,
+                   0.0, 0.0, 0.0, 0.0];
+
+var modGL = 0;
+var modelView = [ 1.0, 0.0, 0.0, 0.0,
+                  0.0, 1.0, 0.0, 0.0,
+                  0.0, 0.0, 1.0, 0.0,
+                  0.0, 0.0,-1.2, 1.0 ];
+
 function Render(){
     gl.clearColor(0.0, 0.4, 0.6, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    const zoom = document.getElementById('zoom').value;
+    modelView[14] = -zoom;
+
+    const fov= document.getElementById('fov').value;
+    const aspect = gl.canvas.width/ gl.canvas.height;
+    Perspective(fov, aspect, 1.0, 2000.0, projection);
+
+
     gl.drawArrays(gl.TRIANGLES,0,vertices.length / 11); 
 
     if (userTexture) {
@@ -542,6 +565,22 @@ function Update(){
 
     gl.uniform4fv(displayGL,new Float32Array(display));
     Render();
+}
+
+function Perspective(fovy, aspect, near, far, matrix)
+{
+    matrix.fill(0);
+    
+    const f = Math.tan(fovy * Math.PI/360.0);
+
+    matrix[0] = f/aspect;
+    matrix[5] = f;
+    matrix[10] = (far + near) / (near - far);
+    matrix[11] = (2*far*near)/(near-far);
+    matrix[14] = -1;
+
+    gl.uniformMatrix4fv(proGL, false, new Float32Array( projection));
+    gl.uniformMatrix4fv(modGL, false, new Float32Array( modelView));
 }
 
 let userTexture = null;

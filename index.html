@@ -13,12 +13,16 @@
         <option>Cylinder</option>
     </select>
 
+    
     <input type="checkbox" id="texture", onchange="Update()" checked> Show Texture <br>
     <input type="file" id="imageUpload" accept="image/*">
 
     <input type="color" id="light" value="#FFFFFF" onchange="Update ()">Light Color<br>
     
     <div id="ui"></div>
+
+    <input type="number"id="fov"value="90"onchange="Render();">FOV<br>
+    <input type="number"id="zoom"value="0.2"onchange="Render();"> Zoom<br>
 
 <canvas id="gl" width="800px" height="600px">
   WebGl is not supported!
@@ -32,6 +36,8 @@
         attribute vec2 UV;
         attribute vec3 Normal;
         uniform vec4 angle;
+        uniform mat4 projection;
+        uniform mat4 modelView;
         varying vec3 vertexColor;
         varying vec2 uv;
         varying vec3 normal;
@@ -49,8 +55,8 @@
                             vec4(0.0, 1.0, 0.0, 0.0),
                             vec4(siY, 0.0, coY, 0.0),
                             vec4(0.0, 0.0, 0.0, 1.0));
-            gl_Position= matY* matX* vec4(Pos, 1.0) + vec4(0.0,0.0,0.2,1.0);
-            vertexColor= Color;
+            gl_Position = projection* modelView*  matY* matX* vec4(Pos, 1.0) + vec4(0.0,0.0,0.2,1.0);
+            vertexColor = Color;
             uv = UV;
             normal = normalize(mat3(matY * matX) * Normal);
         }
