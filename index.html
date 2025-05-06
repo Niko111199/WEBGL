@@ -22,7 +22,7 @@
     <div id="ui"></div>
 
     <input type="number"id="fov"value="90"onchange="Render();">FOV<br>
-    <input type="number"id="zoom"value="0.2"onchange="Render();"> Zoom<br>
+    <input type="number"id="zoom"value="1.2"onchange="Render();"> Zoom<br>
 
 <canvas id="gl" width="800px" height="600px">
   WebGl is not supported!
@@ -38,29 +38,40 @@
         uniform vec4 angle;
         uniform mat4 projection;
         uniform mat4 modelView;
+        uniform float bendFactor; // Added uniform for bend factor
         varying vec3 vertexColor;
         varying vec2 uv;
         varying vec3 normal;
         void main()
         {
-            float coX= cos(angle.x);
-            float siX= sin(angle.x);
-            mat4 matX= mat4(vec4(1.0, 0.0, 0.0, 0.0),
-                            vec4(0.0, coX, siX, 0.0),
-                            vec4(0.0,-siX, coX, 0.0),
-                            vec4(0.0, 0.0, 0.0, 1.0));
-            float coY= cos(angle.y);
-            float siY= sin(angle.y);
-            mat4 matY= mat4(vec4(coY, 0.0,-siY, 0.0),
-                            vec4(0.0, 1.0, 0.0, 0.0),
-                            vec4(siY, 0.0, coY, 0.0),
-                            vec4(0.0, 0.0, 0.0, 1.0));
-            gl_Position = projection* modelView*  matY* matX* vec4(Pos, 1.0) + vec4(0.0,0.0,0.2,1.0);
+            float coX = cos(angle.x);
+            float siX = sin(angle.x);
+            mat4 matX = mat4(vec4(1.0, 0.0, 0.0, 0.0),
+                             vec4(0.0, coX, siX, 0.0),
+                             vec4(0.0, -siX, coX, 0.0),
+                             vec4(0.0, 0.0, 0.0, 1.0));
+            float coY = cos(angle.y);
+            float siY = sin(angle.y);
+            mat4 matY = mat4(vec4(coY, 0.0, -siY, 0.0),
+                             vec4(0.0, 1.0, 0.0, 0.0),
+                             vec4(siY, 0.0, coY, 0.0),
+                             vec4(0.0, 0.0, 0.0, 1.0));
+                             
+            // Apply bend transformation
+            float bend = bendFactor * Pos.y;
+            float coZ = cos(bend);
+            float siZ = sin(bend);
+            mat4 bendMat = mat4(vec4(coZ, siZ, 0.0, 0.0),
+                                vec4(-siZ, coZ, 0.0, 0.0),
+                                vec4(0.0, 0.0, 1.0, 0.0),
+                                vec4(0.0, 0.0, 0.0, 1.0));
+                                
+            gl_Position = projection * modelView * matY * matX * bendMat * vec4(Pos, 1.0) + vec4(0.0, 0.0, 0.2, 1.0);
             vertexColor = Color;
             uv = UV;
-            normal = normalize(mat3(matY * matX) * Normal);
+            normal = normalize(mat3(matY * matX * bendMat) * Normal);
         }
-</textarea>
+    </textarea>
 </div>
 
 <div>
@@ -83,10 +94,11 @@
             vec3 color = vertexColor;
             gl_FragColor = vec4(mix(color, textureColor, p)*Shade, 1.0);
         }
-</textarea>
+    </textarea>
 </div>
 
 
 
-
 <script src="script.js" defer></script>
+</body>
+</html>

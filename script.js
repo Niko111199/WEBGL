@@ -11,6 +11,9 @@ var textureGL = 0;
 var display = [1.0, 1.0, 1.0, 1.0];
 var displayGL = 0;
 
+var bendFactor = 0.0; // Added variable for bend factor
+var bendFactorGL = 0; // Added uniform location for bend factor
+
 document.getElementById('gl').addEventListener(
     'mousemove', function(e){
         if (e.buttons == 1){
@@ -100,133 +103,131 @@ function createQuad(width,height){
 
 
 
-function Create3DCube(width, height, depth){
+function Create3DCube(width, height, depth) {
     vertices.length = 0;
     const w = width * 0.5;
     const h = height * 0.5;
     const d = depth * 0.5;
 
-    // Forside (rød)
-    AddQuad(-w, -h,  d, 1, 0, 0, 0.0, 0.0, 0.0, 0.0, 1.0,
-             w, -h,  d, 1, 0, 0, 1.0, 0.0, 0.0, 0.0, 1.0,
-             w,  h,  d, 1, 0, 0, 1.0, 1.0, 0.0, 0.0, 1.0,
-            -w,  h,  d, 1, 0, 0, 0.0, 1.0, 0.0, 0.0, 1.0);
+    // Front face
+    AddQuad(-w, -h, d, 1, 0, 0, 0.0, 0.0, 0, 0, 1,
+             w, -h, d, 1, 0, 0, 1.0, 0.0, 0, 0, 1,
+             w,  h, d, 1, 0, 0, 1.0, 1.0, 0, 0, 1,
+            -w,  h, d, 1, 0, 0, 0.0, 1.0, 0, 0, 1);
 
-    // Bagside (grøn)
-    AddQuad( w, -h, -d, 0, 1, 0, 0.0, 0.0, 0.0, 0.0, 1.0,
-            -w, -h, -d, 0, 1, 0, 1.0, 0.0, 0.0, 0.0, 1.0,
-            -w,  h, -d, 0, 1, 0, 1.0, 1.0, 0.0, 0.0, 1.0,
-             w,  h, -d, 0, 1, 0, 0.0, 1.0, 0.0, 0.0, 1.0);
+    // Back face
+    AddQuad(w, -h, -d, 0, 1, 0, 0.0, 0.0, 0, 0, -1,
+            -w, -h, -d, 0, 1, 0, 1.0, 0.0, 0, 0, -1,
+            -w,  h, -d, 0, 1, 0, 1.0, 1.0, 0, 0, -1,
+             w,  h, -d, 0, 1, 0, 0.0, 1.0, 0, 0, -1);
 
-    // Top (blå)
-    AddQuad(-w,  h,  d, 0, 0, 1, 0.0, 0.0, 0.0, 0.0, 1.0,
-             w,  h,  d, 0, 0, 1, 1.0, 0.0, 0.0, 0.0, 1.0,
-             w,  h, -d, 0, 0, 1, 1.0, 1.0, 0.0, 0.0, 1.0,
-            -w,  h, -d, 0, 0, 1, 0.0, 1.0, 0.0, 0.0, 1.0);
+    // Top face
+    AddQuad(-w, h, d, 0, 0, 1, 0.0, 0.0, 0, 1, 0,
+             w, h, d, 0, 0, 1, 1.0, 0.0, 0, 1, 0,
+             w, h, -d, 0, 0, 1, 1.0, 1.0, 0, 1, 0,
+            -w, h, -d, 0, 0, 1, 0.0, 1.0, 0, 1, 0);
 
-    // Bund (gul)
-    AddQuad(-w, -h, -d, 1, 1, 0, 0.0, 0.0, 0.0, 0.0, 1.0,
-             w, -h, -d, 1, 1, 0, 1.0, 0.0, 0.0, 0.0, 1.0,
-             w, -h,  d, 1, 1, 0, 1.0, 1.0, 0.0, 0.0, 1.0,
-            -w, -h,  d, 1, 1, 0, 0.0, 1.0, 0.0, 0.0, 1.0);
+    // Bottom face
+    AddQuad(-w, -h, -d, 1, 1, 0, 0.0, 0.0, 0, -1, 0,
+             w, -h, -d, 1, 1, 0, 1.0, 0.0, 0, -1, 0,
+             w, -h, d, 1, 1, 0, 1.0, 1.0, 0, -1, 0,
+            -w, -h, d, 1, 1, 0, 0.0, 1.0, 0, -1, 0);
 
-    // Venstre (cyan)
-    AddQuad(-w, -h, -d, 0, 1, 1, 0.0, 0.0, 0.0, 0.0, 1.0, 
-            -w, -h,  d, 0, 1, 1, 1.0, 0.0, 0.0, 0.0, 1.0,
-            -w,  h,  d, 0, 1, 1, 1.0, 1.0, 0.0, 0.0, 1.0,
-            -w,  h, -d, 0, 1, 1, 0.0, 1.0, 0.0, 0.0, 1.0);
+    // Left face
+    AddQuad(-w, -h, -d, 0, 1, 1, 0.0, 0.0, -1, 0, 0,
+            -w, -h, d, 0, 1, 1, 1.0, 0.0, -1, 0, 0,
+            -w, h, d, 0, 1, 1, 1.0, 1.0, -1, 0, 0,
+            -w, h, -d, 0, 1, 1, 0.0, 1.0, -1, 0, 0);
 
-    // Højre (magenta)
-    AddQuad( w, -h,  d, 1, 0, 1, 0.0, 0.0, 0.0, 0.0, 1.0,
-             w, -h, -d, 1, 0, 1, 1.0, 0.0, 0.0, 0.0, 1.0,
-             w,  h, -d, 1, 0, 1, 1.0, 1.0, 0.0, 0.0, 1.0,
-             w,  h,  d, 1, 0, 1, 0.0, 1.0, 0.0, 0.0, 1.0);
+    // Right face
+    AddQuad(w, -h, d, 1, 0, 1, 0.0, 0.0, 1, 0, 0,
+             w, -h, -d, 1, 0, 1, 1.0, 0.0, 1, 0, 0,
+             w, h, -d, 1, 0, 1, 1.0, 1.0, 1, 0, 0,
+             w, h, d, 1, 0, 1, 0.0, 1.0, 1, 0, 0);
 }
 
-function CreateSub3DCube(width, height, depth, subdivideX, subdivideY, subdivideZ){
+function addSubdividedQuad(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, i, j, color1, color2, u1, v1, u2, v2, u3, v3, u4, v4, nx, ny, nz) {
+    // Alternate colors based on the indices (i, j)
+    const color = (i + j) % 2 === 0 ? color1 : color2;
+
+    AddQuad(x1, y1, z1, color[0], color[1], color[2], u1, v1, nx, ny, nz,
+            x4, y4, z4, color[0], color[1], color[2], u4, v4, nx, ny, nz,
+            x3, y3, z3, color[0], color[1], color[2], u3, v3, nx, ny, nz,
+            x2, y2, z2, color[0], color[1], color[2], u2, v2, nx, ny, nz);
+}
+
+function CreateSub3DCube(width, height, depth, subdivideX, subdivideY, subdivideZ) {
     vertices.length = 0;
     const w = width * 0.5;
     const h = height * 0.5;
     const d = depth * 0.5;
 
-    
-    function addSubdividedQuad(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, color, u1, v1, u2, v2, u3, v3, u4, v4,nx1,ny1,nz1,nx2,ny2,nz2,nx3,ny3,nz3,nx4,ny4,nz4) {
-        AddQuad(x1, y1, z1, color[0], color[1], color[2], u1, v1, nx1, ny1, nz1,
-                x2, y2, z2, color[0], color[1], color[2], u2, v2, nx2, ny2, nz2,
-                x3, y3, z3, color[0], color[1], color[2], u3, v3, nx3, ny3, nz3,
-                x4, y4, z4, color[0], color[1], color[2], u4, v4, nx4, ny4, nz4);
-    }
+    const black = [0, 0, 0];
+    const white = [1, 1, 1];
 
-    
+    // Front face
     for (let i = 0; i < subdivideY; i++) {
         for (let j = 0; j < subdivideX; j++) {
             const x1 = -w + j * (w * 2 / subdivideX);
             const x2 = -w + (j + 1) * (w * 2 / subdivideX);
             const y1 = h - i * (h * 2 / subdivideY);
             const y2 = h - (i + 1) * (h * 2 / subdivideY);
-
-            addSubdividedQuad(x1, y1, d, x2, y1, d, x2, y2, d, x1, y2, d, [(i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0]); 
+            addSubdividedQuad(x1, y1, d, x2, y1, d, x2, y2, d, x1, y2, d, i, j, black, white, 0, 0, 1, 1, 1, 0, 0, 1);
         }
     }
 
-    
+    // Back face
     for (let i = 0; i < subdivideY; i++) {
         for (let j = 0; j < subdivideX; j++) {
             const x1 = w - j * (w * 2 / subdivideX);
             const x2 = w - (j + 1) * (w * 2 / subdivideX);
             const y1 = h - i * (h * 2 / subdivideY);
             const y2 = h - (i + 1) * (h * 2 / subdivideY);
-    
-            
-            addSubdividedQuad(x1, y1, -d, x2, y1, -d, x2, y2, -d, x1, y2, -d, [(i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1]);
+            addSubdividedQuad(x1, y1, -d, x2, y1, -d, x2, y2, -d, x1, y2, -d, i, j, black, white, 0, 0, 1, 1, 1, 0, 0, -1);
         }
     }
 
-    
+    // Top face
     for (let i = 0; i < subdivideX; i++) {
         for (let j = 0; j < subdivideZ; j++) {
             const x1 = -w + i * (w * 2 / subdivideX);
             const x2 = -w + (i + 1) * (w * 2 / subdivideX);
             const z1 = -d + j * (d * 2 / subdivideZ);
             const z2 = -d + (j + 1) * (d * 2 / subdivideZ);
-
-            addSubdividedQuad(x1, h, z1, x2, h, z1, x2, h, z2, x1, h, z2, [(i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0]);
+            addSubdividedQuad(x1, h, z1, x2, h, z1, x2, h, z2, x1, h, z2, i, j, black, white, 0, 0, 1, 1, 1, 0, 0, 1);
         }
     }
 
-    
+    // Bottom face
     for (let i = 0; i < subdivideX; i++) {
         for (let j = 0; j < subdivideZ; j++) {
             const x1 = -w + i * (w * 2 / subdivideX);
             const x2 = -w + (i + 1) * (w * 2 / subdivideX);
             const z1 = -d + j * (d * 2 / subdivideZ);
             const z2 = -d + (j + 1) * (d * 2 / subdivideZ);
-
-            addSubdividedQuad(x1, -h, z1, x1, -h, z2, x2, -h, z2, x2, -h, z1, [(i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1]); 
+            addSubdividedQuad(x1, -h, z1, x1, -h, z2, x2, -h, z2, x2, -h, z1, i, j, black, white, 0, 0, 1, 1, 1, 0, 0, -1);
         }
     }
 
-    
+    // Left face
     for (let i = 0; i < subdivideY; i++) {
         for (let j = 0; j < subdivideZ; j++) {
             const y1 = h - i * (h * 2 / subdivideY);
             const y2 = h - (i + 1) * (h * 2 / subdivideY);
             const z1 = -d + j * (d * 2 / subdivideZ);
             const z2 = -d + (j + 1) * (d * 2 / subdivideZ);
-
-            addSubdividedQuad(-w, y1, z1, -w, y1, z2, -w, y2, z2, -w, y2, z1, [(i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0, (i + j) % 2 === 0 ? 1 : 0]);
+            addSubdividedQuad(-w, y1, z1, -w, y1, z2, -w, y2, z2, -w, y2, z1, i, j, black, white, 0, 0, 1, 1, 1, 0, -1, 0);
         }
     }
 
-    
+    // Right face
     for (let i = 0; i < subdivideY; i++) {
         for (let j = 0; j < subdivideZ; j++) {
             const y1 = h - i * (h * 2 / subdivideY);
             const y2 = h - (i + 1) * (h * 2 / subdivideY);
             const z1 = -d + j * (d * 2 / subdivideZ);
             const z2 = -d + (j + 1) * (d * 2 / subdivideZ);
-
-            addSubdividedQuad(w, y1, z1, w, y2, z1, w, y2, z2, w, y1, z2, [(i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1, (i + j) % 2 === 0 ? 0 : 1]);
+            addSubdividedQuad(w, y1, z1, w, y2, z1, w, y2, z2, w, y1, z2, i, j, black, white, 0, 0, 1, 1, 1, 0, 1, 0);
         }
     }
 }
@@ -387,7 +388,8 @@ function CreateGeometryUI(){
         'Radius: <input type="number" id="r" value="'+ r +'" onchange="initShaders();"><br>' +
         'Subdivide X: <input type="number" step="1" id="sx" value="' + x + '" onchange="initShaders();"><br>' +
         'Subdivide Y: <input type="number" step="1" id="sy" value="' + y + '" onchange="initShaders();"><br>' +
-        'Subdivide Z: <input type="number" id="sz" value="' + z + '" onchange="initShaders();"><br>';
+        'Subdivide Z: <input type="number" id="sz" value="' + z + '" onchange="initShaders();"><br>' +
+        'Bend Factor: <input type="range" id="bendSlider" min="0" max="1" step="0.01" value="' + bendFactor + '" oninput="UpdateBend();"><br>';
 
     let e = document.getElementById('shape');
     switch (e.selectedIndex) {
@@ -404,6 +406,11 @@ function CreateGeometryUI(){
     }
 }
 
+function UpdateBend() {
+    bendFactor = parseFloat(document.getElementById('bendSlider').value);
+    gl.uniform1f(bendFactorGL, bendFactor);
+    Render();
+}
 
 function CreateGeometryBuffers(program) {
 
@@ -414,6 +421,7 @@ function CreateGeometryBuffers(program) {
     angleGL = gl.getUniformLocation(program, 'angle');
     proGL=gl.getUniformLocation(program,'projection');
     modGL= gl.getUniformLocation(program,'modelView');
+    bendFactorGL = gl.getUniformLocation(program, 'bendFactor'); // Get uniform location
 
     CreateTexture(program, 'img/tekstur.jpg');
 
@@ -424,6 +432,7 @@ function CreateGeometryBuffers(program) {
     gl.uniform4fv(displayGL, new Float32Array(display));
 
     gl.uniform1i(textureGL, 0);
+    gl.uniform1f(bendFactorGL, bendFactor); // Initialize bend factor
 
     Render();
 }
