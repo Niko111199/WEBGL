@@ -11,8 +11,8 @@ var textureGL = 0;
 var display = [1.0, 1.0, 1.0, 1.0];
 var displayGL = 0;
 
-var bendFactor = 0.0; // Added variable for bend factor
-var bendFactorGL = 0; // Added uniform location for bend factor
+var bendFactor = 0.0; 
+var bendFactorGL = 0; 
 
 document.getElementById('gl').addEventListener(
     'mousemove', function(e){
@@ -147,7 +147,7 @@ function Create3DCube(width, height, depth) {
 }
 
 function addSubdividedQuad(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, i, j, color1, color2, u1, v1, u2, v2, u3, v3, u4, v4, nx, ny, nz) {
-    // Alternate colors based on the indices (i, j)
+    
     const color = (i + j) % 2 === 0 ? color1 : color2;
 
     AddQuad(x1, y1, z1, color[0], color[1], color[2], u1, v1, nx, ny, nz,
@@ -421,7 +421,7 @@ function CreateGeometryBuffers(program) {
     angleGL = gl.getUniformLocation(program, 'angle');
     proGL=gl.getUniformLocation(program,'projection');
     modGL= gl.getUniformLocation(program,'modelView');
-    bendFactorGL = gl.getUniformLocation(program, 'bendFactor'); // Get uniform location
+    bendFactorGL = gl.getUniformLocation(program, 'bendFactor'); 
 
     CreateTexture(program, 'img/tekstur.jpg');
 
@@ -432,7 +432,7 @@ function CreateGeometryBuffers(program) {
     gl.uniform4fv(displayGL, new Float32Array(display));
 
     gl.uniform1i(textureGL, 0);
-    gl.uniform1f(bendFactorGL, bendFactor); // Initialize bend factor
+    gl.uniform1f(bendFactorGL, bendFactor); 
 
     Render();
 }
