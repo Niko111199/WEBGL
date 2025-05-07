@@ -23,6 +23,7 @@
 
     <input type="number"id="fov"value="90"onchange="Render();">FOV<br>
     <input type="number"id="zoom"value="1.2"onchange="Render();"> Zoom<br>
+    
 
 <canvas id="gl" width="800px" height="600px">
   WebGl is not supported!
@@ -39,7 +40,8 @@
         uniform mat4 projection;
         uniform mat4 modelView;
         uniform float bendFactor; 
-        uniform float shearFactor; 
+        uniform float shearFactor;
+        uniform float twistFactor; 
         varying vec3 vertexColor;
         varying vec2 uv;
         varying vec3 normal;
@@ -73,10 +75,16 @@
                                  vec4(0.0, 0.0, 1.0, 0.0),
                                  vec4(0.0, 0.0, 0.0, 1.0));
 
-            gl_Position = projection * modelView * matY * matX * bendMat * shearMat * vec4(Pos, 1.0) + vec4(0.0, 0.0, 0.2, 1.0);
+            //twist
+            mat4 twistMat =mat4(vec4(cos(twistFactor*Pos.z), -sin(twistFactor*Pos.z), 0.0, 0.0),
+                             vec4(sin(twistFactor*Pos.z), cos(twistFactor*Pos.z), 0.0, 0.0),
+                             vec4(0.0, 0.0, 1.0, 0.0),
+                             vec4(0.0, 0.0, 0.0, 1.0));
+
+            gl_Position = projection * modelView * matY * matX * bendMat * shearMat * twistMat * vec4(Pos, 1.0) + vec4(0.0, 0.0, 0.2, 1.0);
             vertexColor = Color;
             uv = UV;
-            normal = normalize(mat3(matY * matX * bendMat) * Normal);
+            normal = normalize(mat3(matY * matX * bendMat * shearMat * twistMat) * Normal);
         }
     </textarea>
 </div>
