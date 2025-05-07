@@ -14,6 +14,9 @@ var displayGL = 0;
 var bendFactor = 0.0;
 var bendFactorGL = 0;
 
+var shearFactor = 0.0;
+var shearFactorGL = 0;
+
 document.getElementById('gl').addEventListener(
     'mousemove', function(e){
         if (e.buttons == 1){
@@ -388,7 +391,8 @@ function CreateGeometryUI(){
         'Subdivide X: <input type="number" step="1" id="sx" value="' + x + '" onchange="initShaders();"><br>' +
         'Subdivide Y: <input type="number" step="1" id="sy" value="' + y + '" onchange="initShaders();"><br>' +
         'Subdivide Z: <input type="number" id="sz" value="' + z + '" onchange="initShaders();"><br>' +
-        'Bend Factor: <input type="range" id="bendSlider" min="0" max="1" step="0.01" value="' + bendFactor + '" oninput="UpdateBend();"><br>';
+        'Bend Factor: <input type="range" id="bendSlider" min="0" max="1" step="0.01" value="' + bendFactor + '" oninput="UpdateBend();"><br>' +
+        'Shear Factor: <input type="range" id="shearSlider" min="0" max="1" step="0.01" value="' + shearFactor + '" oninput="UpdateShear();"><br>';
 
     let e = document.getElementById('shape');
     switch (e.selectedIndex) {
@@ -411,6 +415,12 @@ function UpdateBend() {
     Render();
 }
 
+function UpdateShear() {
+    shearFactor = parseFloat(document.getElementById('shearSlider').value);
+    gl.uniform1f(shearFactorGL, shearFactor);
+    Render();
+}
+
 function CreateGeometryBuffers(program) {
 
     CreateGeometryUI();
@@ -421,6 +431,7 @@ function CreateGeometryBuffers(program) {
     proGL=gl.getUniformLocation(program,'projection');
     modGL= gl.getUniformLocation(program,'modelView');
     bendFactorGL = gl.getUniformLocation(program, 'bendFactor'); 
+    shearFactorGL = gl.getUniformLocation(program, 'shearFactor');
 
     CreateTexture(program, 'img/tekstur.jpg');
 
@@ -432,6 +443,7 @@ function CreateGeometryBuffers(program) {
 
     gl.uniform1i(textureGL, 0);
     gl.uniform1f(bendFactorGL, bendFactor); 
+    gl.uniform1f(shearFactorGL, shearFactor);
 
     Render();
 }

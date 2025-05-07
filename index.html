@@ -39,6 +39,7 @@
         uniform mat4 projection;
         uniform mat4 modelView;
         uniform float bendFactor; 
+        uniform float shearFactor; 
         varying vec3 vertexColor;
         varying vec2 uv;
         varying vec3 normal;
@@ -65,8 +66,14 @@
                                 vec4(-siZ, coZ, 0.0, 0.0),
                                 vec4(0.0, 0.0, 1.0, 0.0),
                                 vec4(0.0, 0.0, 0.0, 1.0));
-                                
-            gl_Position = projection * modelView * matY * matX * bendMat * vec4(Pos, 1.0) + vec4(0.0, 0.0, 0.2, 1.0);
+
+            // Shearing
+            mat4 shearMat = mat4(vec4(1.0, shearFactor, 0.0, 0.0),
+                                 vec4(0.0, 1.0, 0.0, 0.0),
+                                 vec4(0.0, 0.0, 1.0, 0.0),
+                                 vec4(0.0, 0.0, 0.0, 1.0));
+
+            gl_Position = projection * modelView * matY * matX * bendMat * shearMat * vec4(Pos, 1.0) + vec4(0.0, 0.0, 0.2, 1.0);
             vertexColor = Color;
             uv = UV;
             normal = normalize(mat3(matY * matX * bendMat) * Normal);
